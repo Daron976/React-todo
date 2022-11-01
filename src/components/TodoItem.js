@@ -1,80 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styles from './TodoItem.module.css';
 
-class TodoItem extends React.PureComponent {
-  constructor(props) {
-    super(props);
+const TodoItem = (props) => {
+  const [editing, setEdit] = useState(false);
 
-    this.state = {
-      editing: false,
-    };
-  }
-
-  editItem = () => {
-    this.setState({
-      editing: true,
-    });
+  const editItem = () => {
+    setEdit(true);
   };
 
-  editedItem = (e) => {
+  const editedItem = (e) => {
     if (e.key === 'Enter') {
-      this.setState({
-        editing: false,
-      });
+      setEdit(false);
     }
+  };
+
+  const view = {};
+  const edit = {};
+
+  if (editing) {
+    view.display = 'none';
+  } else {
+    edit.display = 'none';
   }
 
-  render() {
-    const { editing } = this.state;
+  const completedItem = {
+    fontStyle: 'italic',
+    color: '#595959',
+    opacity: 0.4,
+    textDecoration: 'line-through',
+  };
+  const {
+    todo, toggleBoolean, deleteTodo, update,
+  } = props;
 
-    const view = {};
-    const edit = {};
-
-    if (editing) {
-      view.display = 'none';
-    } else {
-      edit.display = 'none';
-    }
-
-    const completedItem = {
-      fontStyle: 'italic',
-      color: '#595959',
-      opacity: 0.4,
-      textDecoration: 'line-through',
-    };
-    const {
-      todo, toggleBoolean, deleteTodo, update,
-    } = this.props;
-    return (
-      <li key={todo.id} className={styles.item}>
-        <div onDoubleClick={this.editItem} style={view}>
-          <input
-            type="checkbox"
-            className={styles.checkbox}
-            checked={todo.completed}
-            onChange={() => toggleBoolean(todo.id)}
-          />
-          <button type="button" onClick={() => deleteTodo(todo.id)}>
-            Delete
-          </button>
-          <span style={todo.completed ? completedItem : null}>
-            {todo.title}
-          </span>
-        </div>
+  return (
+    <li key={todo.id} className={styles.item}>
+      <div onDoubleClick={editItem} style={view}>
         <input
-          type="text"
-          className={styles.textInput}
-          style={edit}
-          onChange={(e) => {
-            update(e.target.value, todo.id);
-          }}
-          onKeyDown={this.editedItem}
+          type="checkbox"
+          className={styles.checkbox}
+          checked={todo.completed}
+          onChange={() => toggleBoolean(todo.id)}
         />
-      </li>
-    );
-  }
-}
+        <button type="button" onClick={() => deleteTodo(todo.id)}>
+          Delete
+        </button>
+        <span style={todo.completed ? completedItem : null}>
+          {todo.title}
+        </span>
+      </div>
+      <input
+        type="text"
+        className={styles.textInput}
+        style={edit}
+        onChange={(e) => {
+          update(e.target.value, todo.id);
+        }}
+        onKeyDown={editedItem}
+      />
+    </li>
+  );
+};
 
 TodoItem.propTypes = {
   todo: PropTypes.string.isRequired,
