@@ -10,28 +10,27 @@ class TodoContainer extends React.PureComponent {
     super();
 
     this.state = {
-      todos: [
-        {
-          id: uuidv4(),
-          title: 'Setup development environment',
-          completed: false,
-        },
-        {
-          id: uuidv4(),
-          title: 'Develop website and add content',
-          completed: false,
-        },
-        {
-          id: uuidv4(),
-          title: 'Deply to live server',
-          completed: false,
-        },
-      ],
+      todos: [],
     };
   }
 
+  componentDidMount() {
+    const availableTodos = JSON.parse(localStorage.getItem('todos'));
+    if (availableTodos) {
+      this.setState({
+        todos: availableTodos,
+      });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { todos } = this.state;
+    if (prevState !== todos) {
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+  }
+
   toggleBoolean = (id) => {
-    // const { todos } = this.state;
     this.setState((prev) => ({
       todos: prev.todos.map((todo) => {
         if (todo.id === id) {
@@ -69,6 +68,18 @@ class TodoContainer extends React.PureComponent {
     });
   }
 
+  update = (newTitle, id) => {
+    const { todos } = this.state;
+    this.setState({
+      todos: todos.map((todo) => {
+        if (todo.id === id) {
+          todo.title = newTitle;
+        }
+        return todo;
+      }),
+    });
+  }
+
   render() {
     const { todos } = this.state;
     return (
@@ -80,6 +91,7 @@ class TodoContainer extends React.PureComponent {
             todos={todos}
             toggleBoolean={this.toggleBoolean}
             deleteTodo={this.deleteTodo}
+            update={this.update}
           />
         </div>
       </div>
